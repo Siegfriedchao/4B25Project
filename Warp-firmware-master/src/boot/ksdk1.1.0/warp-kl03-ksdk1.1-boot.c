@@ -58,26 +58,6 @@
 #include "SEGGER_RTT.h"
 #include "warp.h"
 
-/*
-*	Comment out the header file to disable devices
-*/
-//#include "devBMX055.h"
-//#include "devADXL362.h"
-//#include "devMMA8451Q.h"
-//#include "devLPS25H.h"
-//#include "devHDC1000.h"
-//#include "devMAG3110.h"
-//#include "devSI7021.h"
-//#include "devL3GD20H.h"
-//#include "devBME680.h"
-//#include "devTCS34725.h"
-//#include "devSI4705.h"
-//#include "devCCS811.h"
-//#include "devAMG8834.h"
-//#include "devPAN1326.h"
-//#include "devAS7262.h"
-//#include "devAS7263.h"
-
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
 
 /*
