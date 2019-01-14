@@ -188,6 +188,7 @@ void					repeatRegisterReadForDeviceAndAddress(WarpSensorDevice warpSensorDevice
 								uint16_t pullupValue, bool autoIncrement, int chunkReadsPerAddress, bool chatty,
 								int spinDelay, int repetitionsPerAddress, uint16_t sssupplyMillivolts,
 								uint16_t adaptiveSssupplyMaxMillivolts, uint8_t referenceByte);
+void					piezoBuzzerEnable(int timeDelay, int loop);
 int					char2int(int character);
 void					enableSssupply(uint16_t voltageMillivolts);
 void					disableSssupply(void);
@@ -605,10 +606,10 @@ lowPowerPinStates(void)
 #endif
 #endif
 	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740A_CTLEN);
-	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740B_CTLEN);
+//	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740B_CTLEN);
 	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL1);
 	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL2);
-	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
+	//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
 
 #ifndef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 	GPIO_DRV_ClearPinOutput(kWarpPinCLKOUT32K);
@@ -692,7 +693,7 @@ disableTPS82740A(void)
 void
 disableTPS82740B(void)
 {
-	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740B_CTLEN);
+	//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740B_CTLEN);
 }
 
 
@@ -701,7 +702,7 @@ enableTPS82740A(uint16_t voltageMillivolts)
 {
 	setTPS82740CommonControlLines(voltageMillivolts);
 	GPIO_DRV_SetPinOutput(kWarpPinTPS82740A_CTLEN);
-	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740B_CTLEN);
+	//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740B_CTLEN);
 
 	/*
 	 *	Select the TS5A3154 to use the output of the TPS82740
@@ -718,7 +719,7 @@ enableTPS82740B(uint16_t voltageMillivolts)
 {
 	setTPS82740CommonControlLines(voltageMillivolts);
 	GPIO_DRV_ClearPinOutput(kWarpPinTPS82740A_CTLEN);
-	GPIO_DRV_SetPinOutput(kWarpPinTPS82740B_CTLEN);
+	//GPIO_DRV_SetPinOutput(kWarpPinTPS82740B_CTLEN);
 
 	/*
 	 *	Select the TS5A3154 to use the output of the TPS82740
@@ -747,7 +748,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -757,7 +758,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -767,7 +768,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -777,7 +778,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -787,7 +788,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -797,7 +798,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -807,7 +808,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_ClearPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -817,7 +818,7 @@ setTPS82740CommonControlLines(uint16_t voltageMillivolts)
 		{
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL1);
 			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL2);
-			GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
+			//GPIO_DRV_SetPinOutput(kWarpPinTPS82740_VSEL3);
 			
 			break;
 		}
@@ -1278,13 +1279,6 @@ main(void)
 
 
 	/*
-	 *	Power down all sensors:
-	 */
-	activateAllLowPowerSensorModes();
-
-
-
-	/*
 	 *	Initialization: the PAN1326, generating its 32k clock
 	 */
 	//Disable for now
@@ -1314,13 +1308,217 @@ main(void)
 	OSA_TimeDelay(1000);
 
 
-
 	while (1)
 	{
+		/*
+		 *	writing the control bytes
+		 */
 
+		uint8_t		i2cAddress, payloadByte[2], commandByte[1];
+		i2c_status_t	i2cStatus;
+		WarpStatus	status;
+
+		i2cAddress = 0x27; /* current sensor addr, 7-bit */
+
+		i2c_device_t slave =
+		{
+			.address = i2cAddress,
+			.baudRate_kbps = gWarpI2cBaudRateKbps
+		};
+
+		enableI2Cpins(32767);
+
+		/*
+		 *	Wait for I2C initialization to settle.
+		*/
+		OSA_TimeDelay(1000);
+
+		i2cStatus = I2C_DRV_MasterSendDataBlocking(
+					0 /*	I2C instance	*/,
+					&slave,
+					NULL,
+					0,
+					NULL,
+					0,
+					1000);
+		if(i2cStatus != kStatus_I2C_Success)
+		{
+			SEGGER_RTT_printf(0, "\r\n\tI2C write failed, error %d.\n\n", i2cStatus);
+		}
+		disableI2Cpins();
+
+		OSA_TimeDelay(100); /*	needed to wait for conversion to complete	*/
+		/*
+		 *	I2C read operations
+		 */
+
+		enableI2Cpins(32767);
+
+		uint8_t		cmdBuf[1]; /* buffer to store the register address */
+		uint8_t		rcvBuf[4]; /* buffer to store I2C read values */
+		uint16_t	currentValue;
+
+		i2c_status_t	returnValue; /* saved for use later in debugging */
+
+		/*
+		 *	Update the data buffer in a loop 1000 sets of data
+		 */
+
+		returnValue = I2C_DRV_MasterReceiveDataBlocking(
+					0 /* I2C peripheral instance */,
+					&slave,
+					NULL,
+					0,
+					(uint8_t *)rcvBuf,
+					4,
+					500 /* timeout in milliseconds */);
+
+		if(returnValue != kStatus_I2C_Success)
+		{
+			SEGGER_RTT_printf(0, "\r\n\tI2C read failed, error %d.\n\n", returnValue);
+		}
+
+		uint16_t humidity = ((rcvBuf[0] & 0x3F) << 8) + rcvBuf[1];
+		humidity = 100.0 * humidity / (16384.0 - 2.0);
+		uint16_t temperature = (rcvBuf[2] << 6) + ((rcvBuf[3] & 0xFC) >> 2);
+		temperature = (1650.0 * temperature / (16384.0 - 2.0)) - 400.0;
+
+		SEGGER_RTT_printf(0, "Humidity, %d, Temperature, %d\n",humidity, temperature);
+
+		OSA_TimeDelay(100); /*	needed 	*/
+
+		/*
+		 *	writing the control bytes for smoke sensor
+		 */
+
+//		uint8_t		i2cAddress, payloadByte[1], commandByte[1];
+//		i2c_status_t	i2cStatus;
+//		WarpStatus	status;
+
+		i2cAddress = 0x57; /* current sensor addr, 7-bit */
+
+//		i2c_device_t slave =
+//		{
+//			.address = i2cAddress,
+//			.baudRate_kbps = gWarpI2cBaudRateKbps
+//		};
+
+		enableI2Cpins(32767);
+
+		/*
+		 *	Wait for I2C initialization to settle.
+		*/
+		OSA_TimeDelay(50);
+
+		commandByte[0] = 0x09; /* Mode configuration */
+		payloadByte[0] = 0b00000010; /* Particle-sensing mode using 1 LED */
+
+		i2cStatus = I2C_DRV_MasterSendDataBlocking(
+					0 /*	I2C instance	*/,
+					&slave,
+					commandByte,
+					1,
+					payloadByte,
+					1,
+					200);
+		if(i2cStatus != kStatus_I2C_Success)
+		{
+			SEGGER_RTT_printf(0, "\r\n\tI2C write failed, error %d.\n\n", i2cStatus);
+		}
+
+		commandByte[0] = 0x0A; /* Particle-sensing configuration */
+		payloadByte[0] = 0b01100001; /* LSB size 62.5, full scale 16384, pulse width 118, 16bit */
+
+		i2cStatus = I2C_DRV_MasterSendDataBlocking(
+					0 /*	I2C instance	*/,
+					&slave,
+					commandByte,
+					1,
+					payloadByte,
+					1,
+					200);
+		if(i2cStatus != kStatus_I2C_Success)
+		{
+			SEGGER_RTT_printf(0, "\r\n\tI2C write failed, error %d.\n\n", i2cStatus);
+		}
+
+		commandByte[0] = 0x0C; /* LED1 Red pulse amplitude */
+		payloadByte[0] = 0x7F; /* 25.4 mA */
+
+		i2cStatus = I2C_DRV_MasterSendDataBlocking(
+					0 /*	I2C instance	*/,
+					&slave,
+					commandByte,
+					1,
+					payloadByte,
+					1,
+					200);
+		if(i2cStatus != kStatus_I2C_Success)
+		{
+			SEGGER_RTT_printf(0, "\r\n\tI2C write failed, error %d.\n\n", i2cStatus);
+		}
+
+		OSA_TimeDelay(100); /*	needed to wait for conversion to complete	*/
+		disableI2Cpins();
+
+	//	/*
+	//	 *	I2C read operations
+	//	 */
+
+	//	enableI2Cpins(32767);
+
+	//	uint8_t		cmdBuf[1]; /* buffer to store the register address */
+	//	uint8_t		rcvBuf[4]; /* buffer to store I2C read values */
+	//	uint16_t	currentValue;
+
+	//	i2c_status_t	returnValue; /* saved for use later in debugging */
+
+	//	/*
+	//	 *	Update the data buffer in a loop 1000 sets of data
+	//	 */
+
+	//	returnValue = I2C_DRV_MasterReceiveDataBlocking(
+	//				0 /* I2C peripheral instance */,
+	//				&slave,
+	//				NULL,
+	//				0,
+	//				(uint8_t *)rcvBuf,
+	//				4,
+	//				500 /* timeout in milliseconds */);
+
+	//	if(returnValue != kStatus_I2C_Success)
+	//	{
+	//		SEGGER_RTT_printf(0, "\r\n\tI2C read failed, error %d.\n\n", returnValue);
+	//	}
+
+	//	uint16_t humidity = (rcvBuf[0] & 0x3F) << 8 + rcvBuf[1];
+	//	//humidity = 100.0 * humidity / (16384.0 - 2.0);
+	//	uint16_t temperature = (rcvBuf[2] << 6) + (rcvBuf[3] & 0xFC) >> 2;
+	//	//temperature = (1650.0 * temperature / (16384.0 - 2.0)) - 400.0;
+
+	//	SEGGER_RTT_printf(0, "Humidity %d, Temperature %d\n",humidity, temperature);
+
+		OSA_TimeDelay(100); /*	needed 	*/
+
+		piezoBuzzerEnable(10, 100);
 	}
 
 	return 0;
+}
+
+void
+piezoBuzzerEnable(int timeDelay, int loop)
+{
+	/*
+	 *	The below code is used to control piezo buzzer
+	 */
+	for (int i = 0; i < loop; i++)
+	{
+		GPIO_DRV_SetPinOutput(kWarpPinPiezo_Buzzer);
+		OSA_TimeDelay(timeDelay);
+		GPIO_DRV_ClearPinOutput(kWarpPinPiezo_Buzzer);
+		OSA_TimeDelay(timeDelay);
+	}
 }
 
 int

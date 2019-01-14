@@ -1,6 +1,6 @@
 #!/bin/sh
 	
-	# Uncomment this to set ARMGCC_DIR correctly: export ARMGCC_DIR=<full path to arm-gcc directory>
+	export ARMGCC_DIR=/usr/local/Cellar/arm-none-eabi-gcc/7-2018-q2-update
 
 	mkdir -p work
 	mkdir -p work/boards/Warp
