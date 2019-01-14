@@ -61,15 +61,15 @@ enum _gpio_pins
 //	kWarpPinTPS82740_VSEL3			= GPIO_MAKE_PIN(HW_GPIOB, 5),		/*	Warp TPS82740_VSEL3	--> PTB5									*/
 	kWarpPinTS5A3154_IN			= GPIO_MAKE_PIN(HW_GPIOB, 6),		/*	Warp TS5A3154_IN	--> PTB6		(was unused in Warp v2)					*/
 	kWarpPinSI4705_nRST			= GPIO_MAKE_PIN(HW_GPIOB, 7),		/*	Warp SI4705_nRST	--> PTB7		(was unused in Warp v2)					*/
-	kWarpPinPiezo_Buzzer			= GPIO_MAKE_PIN(HW_GPIOB, 5),		/*	Warp Piezo_Buzzer	--> PTB5									*/
-	kWarpPinASADC0_SE0
+	kWarpPinPiezo_Buzzer			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	Warp Piezo_Buzzer	--> PTB5									*/
+	kWarpPinASADC0_SE1			= GPIO_MAKE_PIN(HW_GPIOB, 5),
 
 #ifdef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 	kWarpPinFRDMKL03LED_Red			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	PTB10: LED_Red												*/
 	kWarpPinFRDMKL03LED_Green		= GPIO_MAKE_PIN(HW_GPIOB, 11),		/*	PTB11: LED_Green											*/
 	kWarpPinFRDMKL03LED_Blue		= GPIO_MAKE_PIN(HW_GPIOB, 13),		/*	PTB13: LED_Blue												*/
 #else
-	kWarpPinPAN1326_nSHUTD			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	Warp PAN1326_nSHUTD	--> PTB10		(was unused in Warp v2)					*/
+//	kWarpPinPAN1326_nSHUTD			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	Warp PAN1326_nSHUTD	--> PTB10		(was unused in Warp v2)					*/
 	kWarpPinISL23415_nCS			= GPIO_MAKE_PIN(HW_GPIOB, 11),		/*	Warp ISL23415_nCS	--> PTB11		(was TPS82675_MODE in Warp v2)				*/
 	kWarpPinCLKOUT32K			= GPIO_MAKE_PIN(HW_GPIOB, 13),		/*	Warp KL03_CLKOUT32K	--> PTB13									*/
 #endif

@@ -95,18 +95,18 @@ gpio_output_pin_user_config_t	outputPins[] = {
 		.config.driveStrength = kPortLowDriveStrength,
 	},
 	{
-		.pinName = kWarpPinASADC0_SE0,				/*	ADC pin	*/
+		.pinName = kWarpPinASADC0_SE1,				/*	ADC pin	*/
 		.config.outputLogic = 1,
 		.config.slewRate = kPortSlowSlewRate,
 		.config.driveStrength = kPortLowDriveStrength,
 	},
 #ifndef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
-	{
-		.pinName = kWarpPinPAN1326_nSHUTD,			/*	Was kWarpPinUnusedPTB10 in Warp v2			*/
-		.config.outputLogic = 1,
-		.config.slewRate = kPortSlowSlewRate,
-		.config.driveStrength = kPortLowDriveStrength,
-	},
+//	{
+//		.pinName = kWarpPinPAN1326_nSHUTD,			/*	Was kWarpPinUnusedPTB10 in Warp v2			*/
+//		.config.outputLogic = 1,
+//		.config.slewRate = kPortSlowSlewRate,
+//		.config.driveStrength = kPortLowDriveStrength,
+//	},
 	{
 		.pinName = kWarpPinISL23415_nCS, 			/*	Was kWarpPinTPS82675_MODE in Warp v2			*/
 		.config.outputLogic = 1,

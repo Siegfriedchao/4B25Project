@@ -50,6 +50,9 @@
 #include "fsl_mcglite_hal.h"
 #include "fsl_port_hal.h"
 #include "fsl_lpuart_driver.h"
+#include "fsl_smc_hal.h"
+#include "fsl_pmc_hal.h"
+#include "fsl_adc16_driver.h"
 
 #include "gpio_pins.h"
 #include "SEGGER_RTT.h"
@@ -58,22 +61,22 @@
 /*
 *	Comment out the header file to disable devices
 */
-#include "devBMX055.h"
-#include "devADXL362.h"
-#include "devMMA8451Q.h"
-#include "devLPS25H.h"
-#include "devHDC1000.h"
-#include "devMAG3110.h"
-#include "devSI7021.h"
-#include "devL3GD20H.h"
-#include "devBME680.h"
-#include "devTCS34725.h"
-#include "devSI4705.h"
-#include "devCCS811.h"
-#include "devAMG8834.h"
-#include "devPAN1326.h"
-#include "devAS7262.h"
-#include "devAS7263.h"
+//#include "devBMX055.h"
+//#include "devADXL362.h"
+//#include "devMMA8451Q.h"
+//#include "devLPS25H.h"
+//#include "devHDC1000.h"
+//#include "devMAG3110.h"
+//#include "devSI7021.h"
+//#include "devL3GD20H.h"
+//#include "devBME680.h"
+//#include "devTCS34725.h"
+//#include "devSI4705.h"
+//#include "devCCS811.h"
+//#include "devAMG8834.h"
+//#include "devPAN1326.h"
+//#include "devAS7262.h"
+//#include "devAS7263.h"
 
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
 
@@ -83,77 +86,10 @@
 // #include "btstack_main.h"
 
 
+
 #define						kWarpConstantStringI2cFailure		"\rI2C failed, reg 0x%02x, code %d\n"
 #define						kWarpConstantStringErrorInvalidVoltage	"\rInvalid supply voltage [%d] mV!"
 #define						kWarpConstantStringErrorSanity		"\rSanity Check Failed!"
-
-
-#ifdef WARP_BUILD_ENABLE_DEVADXL362
-volatile WarpSPIDeviceState			deviceADXL362State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVBMX055
-volatile WarpI2CDeviceState			deviceBMX055accelState;
-volatile WarpI2CDeviceState			deviceBMX055gyroState;
-volatile WarpI2CDeviceState			deviceBMX055magState;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVMMA8451Q
-volatile WarpI2CDeviceState			deviceMMA8451QState;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVLPS25H
-volatile WarpI2CDeviceState			deviceLPS25HState;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVHDC1000
-volatile WarpI2CDeviceState			deviceHDC1000State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVMAG3110
-volatile WarpI2CDeviceState			deviceMAG3110State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVSI7021
-volatile WarpI2CDeviceState			deviceSI7021State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVL3GD20H
-volatile WarpI2CDeviceState			deviceL3GD20HState;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVBME680
-volatile WarpI2CDeviceState			deviceBME680State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVTCS34725
-volatile WarpI2CDeviceState			deviceTCS34725State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVSI4705
-volatile WarpI2CDeviceState			deviceSI4705State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVCCS811
-volatile WarpI2CDeviceState			deviceCCS811State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVAMG8834
-volatile WarpI2CDeviceState			deviceAMG8834State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVPAN1326
-volatile WarpUARTDeviceState			devicePAN1326BState;
-volatile WarpUARTDeviceState			devicePAN1323ETUState;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVAS7262
-volatile WarpI2CDeviceState			deviceAS7262State;
-#endif
-
-#ifdef WARP_BUILD_ENABLE_DEVAS7263
-volatile WarpI2CDeviceState			deviceAS7263State;
-#endif
 
 /*
  *	TODO: move this and possibly others into a global structure
@@ -184,18 +120,7 @@ void					enableTPS82740B(uint16_t voltageMillivolts);
 void					setTPS82740CommonControlLines(uint16_t voltageMillivolts);
 void					printPinDirections(void);
 void					dumpProcessorState(void);
-void					repeatRegisterReadForDeviceAndAddress(WarpSensorDevice warpSensorDevice, uint8_t baseAddress, 
-								uint16_t pullupValue, bool autoIncrement, int chunkReadsPerAddress, bool chatty,
-								int spinDelay, int repetitionsPerAddress, uint16_t sssupplyMillivolts,
-								uint16_t adaptiveSssupplyMaxMillivolts, uint8_t referenceByte);
 void					piezoBuzzerEnable(int timeDelay, int loop);
-int					char2int(int character);
-void					enableSssupply(uint16_t voltageMillivolts);
-void					disableSssupply(void);
-void					activateAllLowPowerSensorModes(void);
-void					powerupAllSensors(void);
-uint8_t					readHexByte(void);
-int					read4digits(void);
 
 
 /*
@@ -250,6 +175,41 @@ clockManagerCallbackRoutine(clock_notify_struct_t *  notify, void *  callbackDat
 	return result;
 }
 
+static int32_t init_adc(uint32_t instance)
+{
+	#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+	    adc16_calibration_param_t adcCalibraitionParam;
+	#endif
+	    adc16_user_config_t adcUserConfig;
+	    adc16_chn_config_t adcChnConfig;
+
+	#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+	    // Auto calibration
+	    ADC16_DRV_GetAutoCalibrationParam(instance, &adcCalibraitionParam);
+	    ADC16_DRV_SetCalibrationParam(instance, &adcCalibraitionParam);
+	#endif
+
+	    // Initialization ADC for
+	    // 12bit resolution, interrupt mode disabled, hw trigger enabled.
+	    // normal convert speed, VREFH/L as reference,
+	    // disable continuous convert mode.
+	    ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
+	    adcUserConfig.intEnable = false;
+	    adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
+	    adcUserConfig.hwTriggerEnable = true;
+	    adcUserConfig.continuousConvEnable = false;
+	    adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
+	    ADC16_DRV_Init(instance, &adcUserConfig);
+
+	    adcChnConfig.chnNum = 0x01;
+	    adcChnConfig.diffEnable = false;
+	    adcChnConfig.intEnable = true;
+
+	    // Configure channel1
+	    ADC16_DRV_ConfigConvChn(instance, 0x01, &adcChnConfig);
+
+	    return 0;
+}
 
 /*
  *	Override the RTC IRQ handler
@@ -300,25 +260,6 @@ power_manager_error_code_t callback0(power_manager_notify_struct_t *  notify,
 /*
  *	From KSDK power_manager_demo.c <<END>>>
  */
-
-
-
-void
-sleepUntilReset(void)
-{
-	while (1)
-	{
-#ifdef WARP_BUILD_ENABLE_DEVSI4705
-		GPIO_DRV_SetPinOutput(kWarpPinSI4705_nRST);
-#endif
-		warpLowPowerSecondsSleep(1, false /* forceAllPinsIntoLowPowerState */);
-#ifdef WARP_BUILD_ENABLE_DEVSI4705
-		GPIO_DRV_ClearPinOutput(kWarpPinSI4705_nRST);
-#endif
-		warpLowPowerSecondsSleep(60, true /* forceAllPinsIntoLowPowerState */);
-	}
-}
-
 
 void
 enableLPUARTpins(void)
@@ -601,7 +542,7 @@ lowPowerPinStates(void)
 #else
 	#ifndef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 #ifdef WARP_BUILD_ENABLE_DEVPAN1326
-	GPIO_DRV_ClearPinOutput(kWarpPinPAN1326_nSHUTD);
+//	GPIO_DRV_ClearPinOutput(kWarpPinPAN1326_nSHUTD);
 #endif
 #endif
 #endif
@@ -968,29 +909,6 @@ dumpProcessorState(void)
 	SEGGER_RTT_printf(0, "\r\tTPM clock: %d\n", CLOCK_SYS_GetTpmGateCmd(0));
 #endif
 }
-
-#ifdef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
-void
-addAndMultiplicationBusyLoop(long iterations)
-{
-	int value;
-	for (volatile long i = 0; i < iterations; i++)
-	{
-		value = kWarpThermalChamberBusyLoopAdder + value * kWarpThermalChamberBusyLoopMutiplier;
-	}
-}
-
-uint8_t
-checkSum(uint8_t *  pointer, uint16_t length) /*	Adapted from https://stackoverflow.com/questions/31151032/writing-an-8-bit-checksum-in-c	*/
-{
-	unsigned int sum;
-	for ( sum = 0 ; length != 0 ; length-- )
-	{
-		sum += *(pointer++);
-	}
-	return (uint8_t)sum;
-}
-#endif
 
 int
 main(void)
@@ -1501,6 +1419,11 @@ main(void)
 		OSA_TimeDelay(100); /*	needed 	*/
 
 		piezoBuzzerEnable(10, 100);
+
+		//if (init_adc(0)) /*	0 refers to ADC_0	*/
+		///{
+		//	SEGGER_RTT_printf(0, "\r\n\tFailed to do the ADC init\n\n");
+		//}
 	}
 
 	return 0;
@@ -1521,51 +1444,3 @@ piezoBuzzerEnable(int timeDelay, int loop)
 	}
 }
 
-int
-char2int(int character)
-{
-	if (character >= '0' && character <= '9')
-	{
-		return character - '0';
-	}
-
-	if (character >= 'a' && character <= 'f')
-	{
-		return character - 'a' + 10;
-	}
-
-	if (character >= 'A' && character <= 'F')
-	{
-		return character - 'A' + 10;
-	}
-
-	return 0;
-}
-
-
-
-uint8_t
-readHexByte(void)
-{
-	uint8_t		topNybble, bottomNybble;
-
-	topNybble = SEGGER_RTT_WaitKey();
-	bottomNybble = SEGGER_RTT_WaitKey();
-
-	return (char2int(topNybble) << 4) + char2int(bottomNybble);
-}
-
-
-
-int
-read4digits(void)
-{
-	uint8_t		digit1, digit2, digit3, digit4;
-	
-	digit1 = SEGGER_RTT_WaitKey();
-	digit2 = SEGGER_RTT_WaitKey();
-	digit3 = SEGGER_RTT_WaitKey();
-	digit4 = SEGGER_RTT_WaitKey();
-
-	return (digit1 - '0')*1000 + (digit2 - '0')*100 + (digit3 - '0')*10 + (digit4 - '0');
-}
