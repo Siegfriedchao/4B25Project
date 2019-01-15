@@ -3,6 +3,8 @@
 	
 	Additional contributions, 2018: Jan Heck, Chatura Samarakoon, Youchao Wang.
 
+	Modified by Youchao Wang for 4B25 individual project.
+
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -594,59 +596,11 @@ lowPowerPinStates(void)
 #endif
 	GPIO_DRV_SetPinOutput(kWarpPinADXL362_CS);
 
-
-	/*
-	 *	When the PAN1326 is installed, note that it has the
-	 *	following pull-up/down by default:
-	 *
-	 *		HCI_RX / kWarpPinI2C0_SCL	: pull up
-	 *		HCI_TX / kWarpPinI2C0_SDA	: pull up
-	 *		HCI_RTS / kWarpPinSPI_MISO	: pull up
-	 *		HCI_CTS / kWarpPinSPI_MOSI	: pull up
-	 *
-	 *	These I/Os are 8mA (see panasonic_PAN13xx.pdf, page 10),
-	 *	so we really don't want to be driving them low. We
-	 *	however also have to be careful of the I2C pullup and
-	 *	pull-up gating. However, driving them high leads to
-	 *	higher board power dissipation even when SSSUPPLY is off
-	 *	by ~80mW on board #003 (PAN1326 populated).
-	 *
-	 *	In revB board, with the ISL23415 DCP pullups, we also
-	 *	want I2C_SCL and I2C_SDA driven high since when we
-	 *	send a shutdown command to the DCP it will connect
-	 *	those lines to 25570_VOUT. 
-	 *
-	 *	For now, we therefore leave the SPI pins low and the
-	 *	I2C pins (PTB3, PTB4, which are true open-drain) disabled.
-	 */
-
 	GPIO_DRV_ClearPinOutput(kWarpPinI2C0_SDA);
 	GPIO_DRV_ClearPinOutput(kWarpPinI2C0_SCL);
 	GPIO_DRV_ClearPinOutput(kWarpPinSPI_MOSI);
 	GPIO_DRV_ClearPinOutput(kWarpPinSPI_MISO);
 	GPIO_DRV_ClearPinOutput(kWarpPinSPI_SCK);
-
-	/*
-	 *	HCI_RX / kWarpPinI2C0_SCL is an input. Set it low.
-	 */
-	//GPIO_DRV_SetPinOutput(kWarpPinI2C0_SCL);
-
-	/*
-	 *	HCI_TX / kWarpPinI2C0_SDA is an output. Set it high.
-	 */
-	//GPIO_DRV_SetPinOutput(kWarpPinI2C0_SDA);
-
-	/*
-	 *	HCI_RTS / kWarpPinSPI_MISO is an output. Set it high.
-	 */
-	//GPIO_DRV_SetPinOutput(kWarpPinSPI_MISO);
-
-	/*
-	 *	From PAN1326 manual, page 10:
-	 *
-	 *		"When HCI_CTS is high, then CC256X is not allowed to send data to Host device"
-	 */
-	//GPIO_DRV_SetPinOutput(kWarpPinSPI_MOSI);
 }
 
 int
