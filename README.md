@@ -31,7 +31,9 @@ To run the system, use the following commands
 
 Please follow the [link](https://github.com/physical-computation/Warp-firmware) for full information on how to configure `Warp-firmware`.
 
-The raw data for measurements are stored in the `/data` folder, these are captured using the developed system as well as Salae logic analyser, refer to the final report for more [4].
+The raw data for measurements are stored in the `/Data` folder, these are captured using the developed system as well as Salae logic analyser, refer to the final report for more [4].
+
+The `/Reference and Manual` folder contains datasheets as well as references [1] and [2].
 
 ## Reference
 [1] Y. Wang, “A Low-cost Sensor Module for In-Building Monitoring and Threat Detection Interim Report for
