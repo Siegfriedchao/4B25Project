@@ -186,3 +186,35 @@ devSSD1331init(void)
 
 	return 0;
 }
+
+void
+printRedSSD1331(void)
+{
+	writeCommand(kSSD1331CommandDISPLAYON);		// Turn on oled panel
+	writeCommand(kSSD1331CommandDRAWRECT);	//0x22 Enter the “draw rectangle mode” by execute the command 22h
+	writeCommand(0x00);	//Set the starting column coordinates, Column 1. e.g., 03h.
+	writeCommand(0x00);	//Set the starting row coordinates, Row 1. e.g., 02h.
+	writeCommand(0x5F);	//Set the finishing column coordinates, Column 2. e.g., 12h
+	writeCommand(0x3F);	//Set the finishing row coordinates, Row 2. e.g., 15h
+	writeCommand(0xFF);	//Set the outline color C (Blue)
+	writeCommand(0x00);	//Set the outline color B (Green)
+	writeCommand(0x00);	//Set the outline color A (Red)
+	writeCommand(0xFF);	//Set the filled color C (Blue)
+	writeCommand(0x00);	//Set the filled color B (Green)
+	writeCommand(0x00);	//Set the filled color A (Red)
+}
+
+void
+switchOffSSD1331(void)
+{
+	/*
+	 *	Clear Screen
+	 */
+	writeCommand(kSSD1331CommandCLEAR);
+	writeCommand(0x00);
+	writeCommand(0x00);
+	writeCommand(0x5F);
+	writeCommand(0x3F);
+
+	writeCommand(kSSD1331CommandDISPLAYOFF);		// Turn off oled panel
+}

@@ -592,9 +592,8 @@ lowPowerPinStates(void)
 	#ifndef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 	GPIO_DRV_SetPinOutput(kWarpPinISL23415_nCS);
 #endif
-#ifdef WARP_BUILD_ENABLE_DEVADXL362
 	GPIO_DRV_SetPinOutput(kWarpPinADXL362_CS);
-#endif
+
 
 	/*
 	 *	When the PAN1326 is installed, note that it has the
@@ -828,6 +827,8 @@ main(void)
 	 */
 	OSA_TimeDelay(1000);
 
+	devSSD1331init();
+
 
 	while (1)
 	{
@@ -886,22 +887,29 @@ main(void)
 
 		OSA_TimeDelay(1000); /*	needed 	*/
 
-		calibrateParams();
+	//	calibrateParams();
 
-		if(init_adc(0U))
-		{
-			SEGGER_RTT_printf(0, "\r\n\tFailed to do the ADC init\n\n");
-		}
+	//	if(init_adc(0U))
+	//	{
+	//		SEGGER_RTT_printf(0, "\r\n\tFailed to do the ADC init\n\n");
+	//	}
 
 		OSA_TimeDelay(100);
 		//ADC16_DRV_WaitConvDone(0 /*instance*/, 0x01/*channel 1*/);
 
-		uint16_t adcValue = ADC16_DRV_GetConvValueRAW(0 /*instance*/, 1U/*channel 1*/);
+	//	uint16_t adcValue = ADC16_DRV_GetConvValueRAW(0 /*instance*/, 1U/*channel 1*/);
 
-		SEGGER_RTT_printf(0, "ADC value %d\n",adcValue);
+	//	SEGGER_RTT_printf(0, "ADC value %d\n",adcValue);
 
 		piezoBuzzerEnable(10, 100);
-		devSSD1331init();
+
+		for(int i = 0; i < 20; i++)
+		{
+			printRedSSD1331();
+			OSA_TimeDelay(50);
+			switchOffSSD1331();
+			OSA_TimeDelay(50);
+		}
 	}
 
 	return 0;
