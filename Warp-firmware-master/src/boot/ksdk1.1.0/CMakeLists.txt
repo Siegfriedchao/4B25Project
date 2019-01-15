@@ -96,6 +96,7 @@ ADD_EXECUTABLE(Warp
     "${ProjDirPath}/../../../../platform/startup/MKL03Z4/system_MKL03Z4.c"
     "${ProjDirPath}/../../../../platform/startup/startup.c"
     "${ProjDirPath}/../../../../platform/startup/startup.h"
+    "${ProjDirPath}/../../src/devSSD1331.c"
     "${ProjDirPath}/../../../../boards/Warp/gpio_pins.c"
     "${ProjDirPath}/../../../../boards/Warp/gpio_pins.h"
 )

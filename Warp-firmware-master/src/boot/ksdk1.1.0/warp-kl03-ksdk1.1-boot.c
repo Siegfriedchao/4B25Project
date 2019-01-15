@@ -54,6 +54,7 @@
 #include "fsl_pmc_hal.h"
 #include "fsl_adc16_driver.h"
 
+#include "devSSD1331.h"
 #include "gpio_pins.h"
 #include "SEGGER_RTT.h"
 #include "warp.h"
@@ -65,6 +66,7 @@
 #define						kWarpConstantStringErrorInvalidVoltage	"\rInvalid supply voltage [%d] mV!"
 #define						kWarpConstantStringErrorSanity		"\rSanity Check Failed!"
 
+#define PMC_BASE				(0x4007D000u)
 /*
  *	TODO: move this and possibly others into a global structure
  */
@@ -154,25 +156,91 @@ static int32_t init_adc(uint32_t instance) /*	Transplanted from adc_low_power de
 		ADC16_DRV_SetCalibrationParam(instance, &adcCalibraitionParam);
 	#endif
 
-	// Initialization ADC for
-	// 12bit resolution, interrupt mode disabled, hw trigger enabled.
-	// normal convert speed, VREFH/L as reference,
-	// disable continuous convert mode.
+	/*
+	 *	Initialization ADC for
+	 *	12bit resolution, interrupt mode disabled, hw trigger disabled.
+	 *	normal convert speed, VREFH/L as reference,
+	 *	disable continuous convert mode.
+	 */
+
 	ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
 	adcUserConfig.intEnable = false;
 	adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
-	adcUserConfig.hwTriggerEnable = true;
+	adcUserConfig.hwTriggerEnable = false;
 	adcUserConfig.continuousConvEnable = false;
 	adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
-	ADC16_DRV_Init(instance, &adcUserConfig);	
-	adcChnConfig.chnNum = 0x01;
+	adcUserConfig.refVoltSrcMode = kAdcRefVoltSrcOfValt; /* this line is added for Vdd Vss ref */
+
+	ADC16_DRV_Init(instance, &adcUserConfig);
+
+	adcChnConfig.chnNum = 1U;
 	adcChnConfig.diffEnable = false;
-	adcChnConfig.intEnable = true;	
-	// Configure channel1
-	ADC16_DRV_ConfigConvChn(instance, 0x01, &adcChnConfig);	
+	adcChnConfig.intEnable = true;
+
+	/* Configure channel1 */
+	ADC16_DRV_ConfigConvChn(instance, 1U, &adcChnConfig);	/* triggers conversion */
+
 	return 0;
 }
 
+void calibrateParams(void)
+{
+#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+    adc16_calibration_param_t adcCalibraitionParam;
+#endif
+    adc16_user_config_t adcUserConfig;
+    adc16_chn_config_t adcChnConfig;
+    uint32_t bandgapValue = 0;  /*! ADC value of BANDGAP */
+    uint32_t vdd = 0;           /*! VDD in mV */
+
+#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+    // Auto calibration
+    ADC16_DRV_GetAutoCalibrationParam(0, &adcCalibraitionParam);
+    ADC16_DRV_SetCalibrationParam(0, &adcCalibraitionParam);
+#endif
+
+    // Enable BANDGAP reference voltage
+    PMC_HAL_SetBandgapBufferCmd(PMC_BASE, true);
+
+    // Initialization ADC for
+    // 16bit resolution, interrupt mode, hw trigger disabled.
+    // normal convert speed, VREFH/L as reference,
+    // disable continuous convert mode.
+    ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
+    adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
+    adcUserConfig.continuousConvEnable = false;
+    adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
+    ADC16_DRV_Init(0, &adcUserConfig);
+
+#if FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+    ADC16_DRV_EnableHwAverage(0, kAdcHwAverageCountOf32);
+#endif // FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+
+    adcChnConfig.chnNum = 27U;
+    adcChnConfig.diffEnable = false;
+    adcChnConfig.intEnable = false;
+    ADC16_DRV_ConfigConvChn(0, 1U, &adcChnConfig);
+
+    // Wait for the conversion to be done
+   //ADC16_DRV_WaitConvDone(0, 1U); //TODO
+
+    // Get current ADC BANDGAP value
+    bandgapValue = ADC16_DRV_GetConvValueRAW(0, 1U);
+    bandgapValue = ADC16_DRV_ConvRAWData(bandgapValue, false, adcUserConfig.resolutionMode);
+
+    // ADC stop conversion
+    ADC16_DRV_PauseConv(0, 1U);
+
+    // Get VDD value measured in mV: VDD = (ADCR_VDD x V_BG) / ADCR_BG
+    vdd = 65535U * 1000U / bandgapValue;
+
+#if FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+    ADC16_DRV_DisableHwAverage(0);
+#endif // FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+
+    // Disable BANDGAP reference voltage
+    PMC_HAL_SetBandgapBufferCmd(PMC_BASE, false);
+}
 /*
  *	Override the RTC IRQ handler
  */
@@ -431,8 +499,6 @@ lowPowerPinStates(void)
 	 */
 
 	PORT_HAL_SetMuxMode(PORTA_BASE, 12, kPortMuxAsGpio);
-
-
 
 	/*
 	 *			PORT B
@@ -820,8 +886,22 @@ main(void)
 
 		OSA_TimeDelay(1000); /*	needed 	*/
 
-		piezoBuzzerEnable(10, 100);
+		calibrateParams();
 
+		if(init_adc(0U))
+		{
+			SEGGER_RTT_printf(0, "\r\n\tFailed to do the ADC init\n\n");
+		}
+
+		OSA_TimeDelay(100);
+		//ADC16_DRV_WaitConvDone(0 /*instance*/, 0x01/*channel 1*/);
+
+		uint16_t adcValue = ADC16_DRV_GetConvValueRAW(0 /*instance*/, 1U/*channel 1*/);
+
+		SEGGER_RTT_printf(0, "ADC value %d\n",adcValue);
+
+		piezoBuzzerEnable(10, 100);
+		devSSD1331init();
 	}
 
 	return 0;
