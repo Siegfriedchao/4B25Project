@@ -76,26 +76,20 @@ gpio_output_pin_user_config_t	outputPins[] = {
 //		.config.slewRate = kPortSlowSlewRate,
 //		.config.driveStrength = kPortLowDriveStrength,
 //	},
+//	{
+//		.pinName = kWarpPinTS5A3154_IN,				/*	Was kWarpPinUnusedPTB6 in Warp v2			*/
+//		.config.outputLogic = 1,
+//		.config.slewRate = kPortSlowSlewRate,
+//		.config.driveStrength = kPortLowDriveStrength,
+//	},
+//	{
+//		.pinName = kWarpPinSI4705_nRST,				/*	Was kWarpPinUnusedPTB7 in Warp v2			*/
+//		.config.outputLogic = 1,
+//		.config.slewRate = kPortSlowSlewRate,
+//		.config.driveStrength = kPortLowDriveStrength,
+//	},
 	{
-		.pinName = kWarpPinTS5A3154_IN,				/*	Was kWarpPinUnusedPTB6 in Warp v2			*/
-		.config.outputLogic = 1,
-		.config.slewRate = kPortSlowSlewRate,
-		.config.driveStrength = kPortLowDriveStrength,
-	},
-	{
-		.pinName = kWarpPinSI4705_nRST,				/*	Was kWarpPinUnusedPTB7 in Warp v2			*/
-		.config.outputLogic = 1,
-		.config.slewRate = kPortSlowSlewRate,
-		.config.driveStrength = kPortLowDriveStrength,
-	},
-	{
-		.pinName = kWarpPinPiezo_Buzzer,				/*	PTB5 for piezo buzzer	*/
-		.config.outputLogic = 1,
-		.config.slewRate = kPortSlowSlewRate,
-		.config.driveStrength = kPortLowDriveStrength,
-	},
-	{
-		.pinName = kWarpPinASADC0_SE1,				/*	ADC pin	*/
+		.pinName = kWarpPinPiezo_Buzzer,			/*	PTB5 for piezo buzzer	*/
 		.config.outputLogic = 1,
 		.config.slewRate = kPortSlowSlewRate,
 		.config.driveStrength = kPortLowDriveStrength,
@@ -120,12 +114,12 @@ gpio_output_pin_user_config_t	outputPins[] = {
 		.config.driveStrength = kPortLowDriveStrength,
 	},
 #endif
-	{
-		.pinName = kWarpPinADXL362_CS,				/*	Was kWarpPinADXL362_CS_PAN1326_nSHUTD in Warp v2	*/
-		.config.outputLogic = 1,
-		.config.slewRate = kPortSlowSlewRate,
-		.config.driveStrength = kPortLowDriveStrength,
-	},
+	//{
+	//	.pinName = kWarpPinADXL362_CS,				/*	Was kWarpPinADXL362_CS_PAN1326_nSHUTD in Warp v2	*/
+	//	.config.outputLogic = 1,
+	//	.config.slewRate = kPortSlowSlewRate,
+	//	.config.driveStrength = kPortLowDriveStrength,
+	//},
 	{
 		.pinName = kWarpPinI2C0_SCL,
 		.config.outputLogic = 1,
@@ -236,10 +230,38 @@ gpio_output_pin_user_config_t	outputPins[] = {
  *
  */
 gpio_input_pin_user_config_t	inputPins[] = {
+//	{
+//		.pinName = kWarpPinKL03_VDD_ADC,
+//		.config.isPullEnable = true,
+//		.config.pullSelect = kPortPullUp,
+//		.config.isPassiveFilterEnabled = false,
+//		.config.interrupt = kPortIntDisabled,
+//	},
 	{
-		.pinName = kWarpPinKL03_VDD_ADC,
+		.pinName = kWarpPinASADC0_SE1,				/*	ADC pin	*/
 		.config.isPullEnable = true,
-		.config.pullSelect = kPortPullUp,
+		.config.pullSelect = kPortPullDown,
+		.config.isPassiveFilterEnabled = false,
+		.config.interrupt = kPortIntDisabled,
+	},
+	{
+		.pinName = kWarpPinDetect_Switch,			/*	Input detection pin	*/
+		.config.isPullEnable = true,
+		.config.pullSelect = kPortPullDown,
+		.config.isPassiveFilterEnabled = false,
+		.config.interrupt = kPortIntDisabled,
+	},
+	{
+		.pinName = kWarpPinDetect_Sound,			/*	Input detection pin	*/
+		.config.isPullEnable = true,
+		.config.pullSelect = kPortPullDown,
+		.config.isPassiveFilterEnabled = false,
+		.config.interrupt = kPortIntDisabled,
+	},
+	{
+		.pinName = kWarpPinDetect_Movement,			/*	Input detection pin	*/
+		.config.isPullEnable = true,
+		.config.pullSelect = kPortPullDown,
 		.config.isPassiveFilterEnabled = false,
 		.config.interrupt = kPortIntDisabled,
 	},

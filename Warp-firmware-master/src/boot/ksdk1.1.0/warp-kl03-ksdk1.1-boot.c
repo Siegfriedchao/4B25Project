@@ -532,8 +532,8 @@ lowPowerPinStates(void)
 	PORT_HAL_SetMuxMode(PORTB_BASE, 3, kPortPinDisabled);
 	PORT_HAL_SetMuxMode(PORTB_BASE, 4, kPortPinDisabled);
 
-
 	PORT_HAL_SetMuxMode(PORTB_BASE, 5, kPortPinDisabled); //disabled as analog
+
 	PORT_HAL_SetMuxMode(PORTB_BASE, 6, kPortMuxAsGpio);
 	PORT_HAL_SetMuxMode(PORTB_BASE, 7, kPortMuxAsGpio);
 
@@ -563,7 +563,7 @@ lowPowerPinStates(void)
 	 */
 	if (gWarpMode & kWarpModeDisableAdcOnSleep)
 	{
-		GPIO_DRV_SetPinOutput(kWarpPinKL03_VDD_ADC);
+		//GPIO_DRV_SetPinOutput(kWarpPinKL03_VDD_ADC);
 	}
 	
 #ifdef WARP_FRDMKL03
@@ -585,8 +585,8 @@ lowPowerPinStates(void)
 	GPIO_DRV_ClearPinOutput(kWarpPinCLKOUT32K);
 #endif
 
-	GPIO_DRV_ClearPinOutput(kWarpPinTS5A3154_IN);
-	GPIO_DRV_ClearPinOutput(kWarpPinSI4705_nRST);
+//	GPIO_DRV_ClearPinOutput(kWarpPinTS5A3154_IN);
+//	GPIO_DRV_ClearPinOutput(kWarpPinSI4705_nRST);
 
 	/*
 	 *	Drive these chip selects high since they are active low:
@@ -594,7 +594,7 @@ lowPowerPinStates(void)
 	#ifndef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 	GPIO_DRV_SetPinOutput(kWarpPinISL23415_nCS);
 #endif
-	GPIO_DRV_SetPinOutput(kWarpPinADXL362_CS);
+	//GPIO_DRV_SetPinOutput(kWarpPinADXL362_CS);
 
 	GPIO_DRV_ClearPinOutput(kWarpPinI2C0_SDA);
 	GPIO_DRV_ClearPinOutput(kWarpPinI2C0_SCL);
@@ -783,6 +783,9 @@ main(void)
 
 	devSSD1331init();
 
+	GPIO_DRV_SetPinDir(kWarpPinDetect_Switch, kGpioDigitalInput);
+	GPIO_DRV_SetPinDir(kWarpPinDetect_Sound, kGpioDigitalInput);
+	GPIO_DRV_SetPinDir(kWarpPinDetect_Movement, kGpioDigitalInput);
 
 	while (1)
 	{
@@ -839,8 +842,6 @@ main(void)
 
 	//	SEGGER_RTT_printf(0, "Humidity %d, Temperature %d\n",humidity, temperature);
 
-		OSA_TimeDelay(1000); /*	needed 	*/
-
 	//	calibrateParams();
 
 	//	if(init_adc(0U))
@@ -857,12 +858,56 @@ main(void)
 
 		piezoBuzzerEnable(10, 100);
 
-		for(int i = 0; i < 20; i++)
+		uint8_t abnormalSoundCount = 0;
+		uint8_t abnormalMovementCount = 0;
+
+		if(GPIO_DRV_ReadPinInput(kWarpPinDetect_Switch))
 		{
-			printRedSSD1331();
-			OSA_TimeDelay(50);
-			switchOffSSD1331();
-			OSA_TimeDelay(50);
+			for (uint8_t i = 0; i < 200; i++)
+			{
+				if (GPIO_DRV_ReadPinInput(kWarpPinDetect_Sound))
+				{
+					abnormalSoundCount++;
+					if (abnormalSoundCount > 50)
+					{
+						piezoBuzzerEnable(10, 100);
+						for(int i = 0; i < 20; i++)
+						{
+							printRedSSD1331();
+							OSA_TimeDelay(50);
+							switchOffSSD1331();
+							OSA_TimeDelay(50);
+						}
+						abnormalSoundCount = 0;
+						break;
+					}
+				}
+				OSA_TimeDelay(5); /* delay 5ms */
+			}
+			abnormalSoundCount = 0;
+
+			for (uint8_t i = 0; i < 10; i++)
+			{
+				if (GPIO_DRV_ReadPinInput(kWarpPinDetect_Movement))
+				{
+					abnormalMovementCount++;
+					if (abnormalMovementCount > 3)
+					{
+						piezoBuzzerEnable(10, 100);
+						for(int i = 0; i < 20; i++)
+						{
+							printRedSSD1331();
+							OSA_TimeDelay(50);
+							switchOffSSD1331();
+							OSA_TimeDelay(50);
+						}
+						abnormalMovementCount = 0;
+						break;
+					}
+				}
+				OSA_TimeDelay(10); /* delay 5ms */
+			}
+			abnormalSoundCount = 0;
 		}
 	}
 

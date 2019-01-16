@@ -57,12 +57,15 @@ enum _gpio_pins
 	kWarpPinTPS82740B_CTLEN			= GPIO_MAKE_PIN(HW_GPIOA, 12),		/*	Warp kWarpPinTPS82740B_CTLEN --> PTA12 		(was kWarpPinTPS82675_EN in Warp v2)			*/
 
 	kWarpPinSPI_SCK				= GPIO_MAKE_PIN(HW_GPIOB, 0),		/*	Warp kWarpPinSPI_SCK	--> PTB0		(was kWarpPinTPS82740A_CTLEN in Warp v2)		*/
-	kWarpPinKL03_VDD_ADC			= GPIO_MAKE_PIN(HW_GPIOB, 1),		/*	Warp KL03 VDD ADC	--> PTB1									*/
+//	kWarpPinKL03_VDD_ADC			= GPIO_MAKE_PIN(HW_GPIOB, 1),		/*	Warp KL03 VDD ADC	--> PTB1									*/
 //	kWarpPinTPS82740_VSEL3			= GPIO_MAKE_PIN(HW_GPIOB, 5),		/*	Warp TPS82740_VSEL3	--> PTB5									*/
-	kWarpPinTS5A3154_IN			= GPIO_MAKE_PIN(HW_GPIOB, 6),		/*	Warp TS5A3154_IN	--> PTB6		(was unused in Warp v2)					*/
-	kWarpPinSI4705_nRST			= GPIO_MAKE_PIN(HW_GPIOB, 7),		/*	Warp SI4705_nRST	--> PTB7		(was unused in Warp v2)					*/
+//	kWarpPinTS5A3154_IN			= GPIO_MAKE_PIN(HW_GPIOB, 6),		/*	Warp TS5A3154_IN	--> PTB6		(was unused in Warp v2)					*/
+//	kWarpPinSI4705_nRST			= GPIO_MAKE_PIN(HW_GPIOB, 7),		/*	Warp SI4705_nRST	--> PTB7		(was unused in Warp v2)					*/
 	kWarpPinPiezo_Buzzer			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	Warp Piezo_Buzzer	--> PTB5									*/
 	kWarpPinASADC0_SE1			= GPIO_MAKE_PIN(HW_GPIOB, 5),
+	kWarpPinDetect_Switch			= GPIO_MAKE_PIN(HW_GPIOB, 6),
+	kWarpPinDetect_Sound			= GPIO_MAKE_PIN(HW_GPIOB, 1),
+	kWarpPinDetect_Movement			= GPIO_MAKE_PIN(HW_GPIOB, 7),
 
 #ifdef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 	kWarpPinFRDMKL03LED_Red			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	PTB10: LED_Red												*/
@@ -83,7 +86,7 @@ enum _gpio_pins
 	kWarpPinUnusedPTA7			= GPIO_MAKE_PIN(HW_GPIOA, 7),		/*	PTA7: unused												*/
 	kWarpPinUnusedPTA9			= GPIO_MAKE_PIN(HW_GPIOA, 9),		/*	PTA9: unused												*/
 #else
-	kWarpPinADXL362_CS			= GPIO_MAKE_PIN(HW_GPIOB, 2),		/*	Warp ADXL362_CS		--> PTB2		(was kWarpPinADXL362_CS_PAN1326_nSHUTD in Warp v2)	*/
+	//kWarpPinADXL362_CS			= GPIO_MAKE_PIN(HW_GPIOB, 2),		/*	Warp ADXL362_CS		--> PTB2		(was kWarpPinADXL362_CS_PAN1326_nSHUTD in Warp v2)	*/
 	kWarpPinI2C0_SCL			= GPIO_MAKE_PIN(HW_GPIOB, 3),		/*	Warp KL03_I2C0_SCL	--> PTB3									*/
 	kWarpPinI2C0_SDA			= GPIO_MAKE_PIN(HW_GPIOB, 4),		/*	Warp KL03_I2C0_SDA	--> PTB4									*/
 	kWarpPinSPI_MISO			= GPIO_MAKE_PIN(HW_GPIOA, 6),		/*	Warp KL03_SPI_MISO	--> PTA6									*/
