@@ -807,7 +807,7 @@ main(void)
 
 		OSA_TimeDelay(100);
 
-		//ADC16_DRV_WaitConvDone(0 /*instance*/, 0x01/*channel 1*/);
+	//	ADC16_DRV_WaitConvDone(0 /*instance*/, 0x01/*channel 1*/);
 
 	//	uint16_t adcValue = ADC16_DRV_GetConvValueRAW(0 /*instance*/, 1U/*channel 1*/);
 
