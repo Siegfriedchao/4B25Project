@@ -797,7 +797,7 @@ main(void)
 
 		readFromTempHumidity();
 
-		OSA_TimeDelay(100); /*	needed 	*/
+		OSA_TimeDelay(50); /*	needed 	*/
 
 		writeToSmokeSensor();
 
@@ -805,51 +805,8 @@ main(void)
 		
 		disableI2Cpins();
 
-	//	/*
-	//	 *	I2C read operations
-	//	 */
-
-	//	enableI2Cpins(32767);
-
-	//	uint8_t		cmdBuf[1]; /* buffer to store the register address */
-	//	uint8_t		rcvBuf[4]; /* buffer to store I2C read values */
-	//	uint16_t	currentValue;
-
-	//	i2c_status_t	returnValue; /* saved for use later in debugging */
-
-	//	/*
-	//	 *	Update the data buffer in a loop 1000 sets of data
-	//	 */
-
-	//	returnValue = I2C_DRV_MasterReceiveDataBlocking(
-	//				0 /* I2C peripheral instance */,
-	//				&slave,
-	//				NULL,
-	//				0,
-	//				(uint8_t *)rcvBuf,
-	//				4,
-	//				500 /* timeout in milliseconds */);
-
-	//	if(returnValue != kStatus_I2C_Success)
-	//	{
-	//		SEGGER_RTT_printf(0, "\r\n\tI2C read failed, error %d.\n\n", returnValue);
-	//	}
-
-	//	uint16_t humidity = (rcvBuf[0] & 0x3F) << 8 + rcvBuf[1];
-	//	//humidity = 100.0 * humidity / (16384.0 - 2.0);
-	//	uint16_t temperature = (rcvBuf[2] << 6) + (rcvBuf[3] & 0xFC) >> 2;
-	//	//temperature = (1650.0 * temperature / (16384.0 - 2.0)) - 400.0;
-
-	//	SEGGER_RTT_printf(0, "Humidity %d, Temperature %d\n",humidity, temperature);
-
-	//	calibrateParams();
-
-	//	if(init_adc(0U))
-	//	{
-	//		SEGGER_RTT_printf(0, "\r\n\tFailed to do the ADC init\n\n");
-	//	}
-
 		OSA_TimeDelay(100);
+
 		//ADC16_DRV_WaitConvDone(0 /*instance*/, 0x01/*channel 1*/);
 
 	//	uint16_t adcValue = ADC16_DRV_GetConvValueRAW(0 /*instance*/, 1U/*channel 1*/);
