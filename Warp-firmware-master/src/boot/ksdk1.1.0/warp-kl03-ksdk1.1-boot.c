@@ -807,10 +807,10 @@ main(void)
 		enableI2Cpins(32767);
 
 		/*
-		 *	Write and read from Temp and Hum sensor for 20 times to take
+		 *	Write and read from Temp and Hum sensor for 10 times to take
 		 *	the average value.
 		 */
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			writeToTempHumidity();
 			OSA_TimeDelay(100); /*	needed to wait for conversion to complete	*/
@@ -854,7 +854,7 @@ main(void)
 			SEGGER_RTT_printf(0, "Reading from sensor, count %d, Humidity, %d, Temperature, %d\n", i, averagedHumidity, averagedTemperature);
 		}
 
-		SEGGER_RTT_printf(0, "Humidity, %d, Temperature, %d\n",averagedHumidity, averagedTemperature);
+		SEGGER_RTT_printf(0, "Humidity, %d, Temperature, %d, ",averagedHumidity, averagedTemperature);
 
 		OSA_TimeDelay(50); /*	needed 	*/
 
@@ -877,9 +877,16 @@ main(void)
 		uint8_t abnormalMovementCount = 0;
 
 		/*
-		 *	First detect whether the mechanical switch is turned on/off
+		 *	Since both the sound and PIR sensor is configured to output 0/1
+		 *	we check the pins directly.
 		 */
-		if(GPIO_DRV_ReadPinInput(kWarpPinDetect_Switch))
+		SEGGER_RTT_printf(0, "Environment noise, %d, ", GPIO_DRV_ReadPinInput(kWarpPinDetect_Sound));
+		SEGGER_RTT_printf(0, "Human movement, %d\n", GPIO_DRV_ReadPinInput(kWarpPinDetect_Movement));
+
+		/*
+		 *	First check whether the mechanical switch is turned on
+		 */
+		if (GPIO_DRV_ReadPinInput(kWarpPinDetect_Switch))
 		{
 			for (uint8_t i = 0; i < 200; i++)
 			{
