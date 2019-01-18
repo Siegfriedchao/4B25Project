@@ -42,7 +42,7 @@ The `/Reference and Manual` folder contains datasheets as well as references [1]
 [2] Y. Wang, “A Low-cost Sensor Module for In-Building Monitoring and Threat Detection Project Proposal
 for 4B25 Embedded Systems,” tech. rep., Cambridge, 2018.
 
-[3] Monnit, “Monnit Corp. Webpage,” 2018.
+[3] Monnit, “Monnit Site,” 2018. [Online]. Available: https://www.monnit.com/. [Accessed: 2019-01-13].
 
 [4] Y. Wang, “A Low-cost Sensor Module for In-Building Monitoring and Threat Detection Final Report
 for 4B25 Embedded Systems,” tech. rep., Cambridge, 2018.
