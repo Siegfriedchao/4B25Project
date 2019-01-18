@@ -156,8 +156,6 @@ devSSD1331init(void)
 	writeCommand(0x3F);
 //	SEGGER_RTT_WriteString(0, "\r\n\tDone with screen clear...\n");
 
-
-
 	/*
 	 *	Read the manual for the SSD1331 (SSD1331_1.2.pdf) to figure
 	 *	out how to fill the entire screen with the brightest shade
@@ -178,15 +176,12 @@ devSSD1331init(void)
 	writeCommand(0xFF);	//Set the filled color B (Green)
 	writeCommand(0x00);	//Set the filled color A (Red)
 
-
-
-//	SEGGER_RTT_WriteString(0, "\r\n\tDone with draw rectangle...\n");
-
-
-
 	return 0;
 }
 
+/*
+ *	This configures the OLED for red display
+ */
 void
 printRedSSD1331(void)
 {
@@ -204,6 +199,9 @@ printRedSSD1331(void)
 	writeCommand(0x00);	//Set the filled color A (Red)
 }
 
+/*
+ *	Switch off the display
+ */
 void
 switchOffSSD1331(void)
 {

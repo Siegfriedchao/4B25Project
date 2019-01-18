@@ -62,10 +62,10 @@ enum _gpio_pins
 //	kWarpPinTS5A3154_IN			= GPIO_MAKE_PIN(HW_GPIOB, 6),		/*	Warp TS5A3154_IN	--> PTB6		(was unused in Warp v2)					*/
 //	kWarpPinSI4705_nRST			= GPIO_MAKE_PIN(HW_GPIOB, 7),		/*	Warp SI4705_nRST	--> PTB7		(was unused in Warp v2)					*/
 	kWarpPinPiezo_Buzzer			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	Warp Piezo_Buzzer	--> PTB5									*/
-	kWarpPinASADC0_SE1			= GPIO_MAKE_PIN(HW_GPIOB, 5),
-	kWarpPinDetect_Switch			= GPIO_MAKE_PIN(HW_GPIOB, 6),
-	kWarpPinDetect_Sound			= GPIO_MAKE_PIN(HW_GPIOB, 1),
-	kWarpPinDetect_Movement			= GPIO_MAKE_PIN(HW_GPIOB, 7),
+	kWarpPinASADC0_SE1			= GPIO_MAKE_PIN(HW_GPIOB, 5),		/*	For ADC use			*/
+	kWarpPinDetect_Switch			= GPIO_MAKE_PIN(HW_GPIOB, 6),		/*	For mechanical switch use	*/
+	kWarpPinDetect_Sound			= GPIO_MAKE_PIN(HW_GPIOB, 1),		/*	For sound detection use		*/
+	kWarpPinDetect_Movement			= GPIO_MAKE_PIN(HW_GPIOB, 7),		/*	For movement detection use	*/
 
 #ifdef WARP_BUILD_ENABLE_THERMALCHAMBERANALYSIS
 	kWarpPinFRDMKL03LED_Red			= GPIO_MAKE_PIN(HW_GPIOB, 10),		/*	PTB10: LED_Red												*/

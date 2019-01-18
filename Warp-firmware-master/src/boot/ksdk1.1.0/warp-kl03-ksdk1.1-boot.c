@@ -90,7 +90,7 @@ volatile WarpModeMask			gWarpMode		= kWarpModeDisableAdcOnSleep;
 void					sleepUntilReset(void);
 void					lowPowerPinStates(void);
 void					piezoBuzzerEnable(int timeDelay, int loop);
-void					readFromTempHumidity(void);
+int *					readFromTempHumidity(void);
 void					writeToSmokeSensor(void);
 void					writeToTempHumidity(void);
 
@@ -144,105 +144,106 @@ clockManagerCallbackRoutine(clock_notify_struct_t *  notify, void *  callbackDat
 	return result;
 }
 
-static int32_t init_adc(uint32_t instance) /*	Transplanted from adc_low_power demo	*/
-{
-	#if FSL_FEATURE_ADC16_HAS_CALIBRATION
-		adc16_calibration_param_t adcCalibraitionParam;
-	#endif
-		adc16_user_config_t adcUserConfig;
-		adc16_chn_config_t adcChnConfig;
+//static int32_t init_adc(uint32_t instance) /*	Transplanted from adc_low_power demo	*/
+//{
+//	#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+//		adc16_calibration_param_t adcCalibraitionParam;
+//	#endif
+//		adc16_user_config_t adcUserConfig;
+//		adc16_chn_config_t adcChnConfig;
+//
+//	#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+//		// Auto calibration
+//		ADC16_DRV_GetAutoCalibrationParam(instance, &adcCalibraitionParam);
+//		ADC16_DRV_SetCalibrationParam(instance, &adcCalibraitionParam);
+//	#endif
+//
+//	/*
+//	 *	Initialization ADC for
+//	 *	12bit resolution, interrupt mode disabled, hw trigger disabled.
+//	 *	normal convert speed, VREFH/L as reference,
+//	 *	disable continuous convert mode.
+//	 */
+//
+//	ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
+//	adcUserConfig.intEnable = false;
+//	adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
+//	adcUserConfig.hwTriggerEnable = false;
+//	adcUserConfig.continuousConvEnable = false;
+//	adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
+//	adcUserConfig.refVoltSrcMode = kAdcRefVoltSrcOfValt; /* this line is added for Vdd Vss ref */
+//
+//	ADC16_DRV_Init(instance, &adcUserConfig);
+//
+//	adcChnConfig.chnNum = 1U;
+//	adcChnConfig.diffEnable = false;
+//	adcChnConfig.intEnable = true;
+//
+//	/* Configure channel1 */
+//	ADC16_DRV_ConfigConvChn(instance, 1U, &adcChnConfig);	/* triggers conversion */
+//
+//	return 0;
+//}
 
-	#if FSL_FEATURE_ADC16_HAS_CALIBRATION
-		// Auto calibration
-		ADC16_DRV_GetAutoCalibrationParam(instance, &adcCalibraitionParam);
-		ADC16_DRV_SetCalibrationParam(instance, &adcCalibraitionParam);
-	#endif
+//void calibrateParams(void)
+//{
+//#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+//    adc16_calibration_param_t adcCalibraitionParam;
+//#endif
+//    adc16_user_config_t adcUserConfig;
+//    adc16_chn_config_t adcChnConfig;
+//    uint32_t bandgapValue = 0;  /*! ADC value of BANDGAP */
+//    uint32_t vdd = 0;           /*! VDD in mV */
+//
+//#if FSL_FEATURE_ADC16_HAS_CALIBRATION
+//    // Auto calibration
+//    ADC16_DRV_GetAutoCalibrationParam(0, &adcCalibraitionParam);
+//    ADC16_DRV_SetCalibrationParam(0, &adcCalibraitionParam);
+//#endif
+//
+//    // Enable BANDGAP reference voltage
+//    PMC_HAL_SetBandgapBufferCmd(PMC_BASE, true);
+//
+//    // Initialization ADC for
+//    // 16bit resolution, interrupt mode, hw trigger disabled.
+//    // normal convert speed, VREFH/L as reference,
+//    // disable continuous convert mode.
+//    ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
+//    adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
+//    adcUserConfig.continuousConvEnable = false;
+//    adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
+//    ADC16_DRV_Init(0, &adcUserConfig);
+//
+//#if FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+//    ADC16_DRV_EnableHwAverage(0, kAdcHwAverageCountOf32);
+//#endif // FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+//
+//    adcChnConfig.chnNum = 27U;
+//    adcChnConfig.diffEnable = false;
+//    adcChnConfig.intEnable = false;
+//    ADC16_DRV_ConfigConvChn(0, 1U, &adcChnConfig);
+//
+//    // Wait for the conversion to be done
+//   //ADC16_DRV_WaitConvDone(0, 1U); //TODO
+//
+//    // Get current ADC BANDGAP value
+//    bandgapValue = ADC16_DRV_GetConvValueRAW(0, 1U);
+//    bandgapValue = ADC16_DRV_ConvRAWData(bandgapValue, false, adcUserConfig.resolutionMode);
+//
+//    // ADC stop conversion
+//    ADC16_DRV_PauseConv(0, 1U);
+//
+//    // Get VDD value measured in mV: VDD = (ADCR_VDD x V_BG) / ADCR_BG
+//    vdd = 65535U * 1000U / bandgapValue;
+//
+//#if FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+//    ADC16_DRV_DisableHwAverage(0);
+//#endif // FSL_FEATURE_ADC16_HAS_HW_AVERAGE
+//
+//    // Disable BANDGAP reference voltage
+//    PMC_HAL_SetBandgapBufferCmd(PMC_BASE, false);
+//}
 
-	/*
-	 *	Initialization ADC for
-	 *	12bit resolution, interrupt mode disabled, hw trigger disabled.
-	 *	normal convert speed, VREFH/L as reference,
-	 *	disable continuous convert mode.
-	 */
-
-	ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
-	adcUserConfig.intEnable = false;
-	adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
-	adcUserConfig.hwTriggerEnable = false;
-	adcUserConfig.continuousConvEnable = false;
-	adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
-	adcUserConfig.refVoltSrcMode = kAdcRefVoltSrcOfValt; /* this line is added for Vdd Vss ref */
-
-	ADC16_DRV_Init(instance, &adcUserConfig);
-
-	adcChnConfig.chnNum = 1U;
-	adcChnConfig.diffEnable = false;
-	adcChnConfig.intEnable = true;
-
-	/* Configure channel1 */
-	ADC16_DRV_ConfigConvChn(instance, 1U, &adcChnConfig);	/* triggers conversion */
-
-	return 0;
-}
-
-void calibrateParams(void)
-{
-#if FSL_FEATURE_ADC16_HAS_CALIBRATION
-    adc16_calibration_param_t adcCalibraitionParam;
-#endif
-    adc16_user_config_t adcUserConfig;
-    adc16_chn_config_t adcChnConfig;
-    uint32_t bandgapValue = 0;  /*! ADC value of BANDGAP */
-    uint32_t vdd = 0;           /*! VDD in mV */
-
-#if FSL_FEATURE_ADC16_HAS_CALIBRATION
-    // Auto calibration
-    ADC16_DRV_GetAutoCalibrationParam(0, &adcCalibraitionParam);
-    ADC16_DRV_SetCalibrationParam(0, &adcCalibraitionParam);
-#endif
-
-    // Enable BANDGAP reference voltage
-    PMC_HAL_SetBandgapBufferCmd(PMC_BASE, true);
-
-    // Initialization ADC for
-    // 16bit resolution, interrupt mode, hw trigger disabled.
-    // normal convert speed, VREFH/L as reference,
-    // disable continuous convert mode.
-    ADC16_DRV_StructInitUserConfigDefault(&adcUserConfig);
-    adcUserConfig.resolutionMode = kAdcResolutionBitOf12or13;
-    adcUserConfig.continuousConvEnable = false;
-    adcUserConfig.clkSrcMode = kAdcClkSrcOfAsynClk;
-    ADC16_DRV_Init(0, &adcUserConfig);
-
-#if FSL_FEATURE_ADC16_HAS_HW_AVERAGE
-    ADC16_DRV_EnableHwAverage(0, kAdcHwAverageCountOf32);
-#endif // FSL_FEATURE_ADC16_HAS_HW_AVERAGE
-
-    adcChnConfig.chnNum = 27U;
-    adcChnConfig.diffEnable = false;
-    adcChnConfig.intEnable = false;
-    ADC16_DRV_ConfigConvChn(0, 1U, &adcChnConfig);
-
-    // Wait for the conversion to be done
-   //ADC16_DRV_WaitConvDone(0, 1U); //TODO
-
-    // Get current ADC BANDGAP value
-    bandgapValue = ADC16_DRV_GetConvValueRAW(0, 1U);
-    bandgapValue = ADC16_DRV_ConvRAWData(bandgapValue, false, adcUserConfig.resolutionMode);
-
-    // ADC stop conversion
-    ADC16_DRV_PauseConv(0, 1U);
-
-    // Get VDD value measured in mV: VDD = (ADCR_VDD x V_BG) / ADCR_BG
-    vdd = 65535U * 1000U / bandgapValue;
-
-#if FSL_FEATURE_ADC16_HAS_HW_AVERAGE
-    ADC16_DRV_DisableHwAverage(0);
-#endif // FSL_FEATURE_ADC16_HAS_HW_AVERAGE
-
-    // Disable BANDGAP reference voltage
-    PMC_HAL_SetBandgapBufferCmd(PMC_BASE, false);
-}
 /*
  *	Override the RTC IRQ handler
  */
@@ -777,28 +778,93 @@ main(void)
 	lowPowerPinStates();
 
 	/*
-	 *	Wait for supply and pull-ups to settle.
+	 *	Initialize the OLED display, and continue for 1 sec then turn off
 	 */
-	OSA_TimeDelay(1000);
-
 	devSSD1331init();
+	OSA_TimeDelay(1000);
+	switchOffSSD1331();
 
+	/*
+	 *	Initialize the piezoBuzzer
+	 */
+	piezoBuzzerEnable(10, 100);
+
+	/*
+	 *	Make sure the following 3 pins are configured as inputs
+	 */
 	GPIO_DRV_SetPinDir(kWarpPinDetect_Switch, kGpioDigitalInput);
 	GPIO_DRV_SetPinDir(kWarpPinDetect_Sound, kGpioDigitalInput);
 	GPIO_DRV_SetPinDir(kWarpPinDetect_Movement, kGpioDigitalInput);
+
+	int *	receivedSensorData;
+	int	averagedTemperature = -1;
+	int	averagedHumidity = -1;
+	int	differenceBetweenTempSensorReadings = 0;
+	int	differenceBetweenHumSensorReadings = 0;
 
 	while (1)
 	{
 		enableI2Cpins(32767);
 
-		writeToTempHumidity();
+		/*
+		 *	Write and read from Temp and Hum sensor for 20 times to take
+		 *	the average value.
+		 */
+		for (int i = 0; i < 20; i++)
+		{
+			writeToTempHumidity();
+			OSA_TimeDelay(100); /*	needed to wait for conversion to complete	*/
+			receivedSensorData = readFromTempHumidity();
 
-		OSA_TimeDelay(100); /*	needed to wait for conversion to complete	*/
+			/*
+			 *	This checks the sensor output to see if 
+			 *	there is abnormal event occuring
+			 */
+			if (averagedHumidity != -1)
+			{
+				differenceBetweenHumSensorReadings = abs(*receivedSensorData - averagedHumidity);
+				differenceBetweenTempSensorReadings = abs(*(receivedSensorData + 1) - averagedTemperature);
 
-		readFromTempHumidity();
+				if (differenceBetweenHumSensorReadings / averagedHumidity > 0.1 
+					|| differenceBetweenTempSensorReadings / averagedHumidity > 0.1)
+				{
+					/*
+					 *	Turn on alarms
+					 */
+					piezoBuzzerEnable(10, 100);
+					for(int i = 0; i < 20; i++)
+					{
+						printRedSSD1331();
+						OSA_TimeDelay(50);
+						switchOffSSD1331();
+						OSA_TimeDelay(50);
+					}
+				}
+			}
+			if (i == 0)
+			{
+				averagedHumidity = *receivedSensorData;
+				averagedTemperature = *(receivedSensorData + 1);
+			}
+			else
+			{
+				averagedHumidity = (averagedHumidity + *receivedSensorData) / 2;
+				averagedTemperature = (averagedTemperature + *(receivedSensorData + 1)) / 2;
+			}
+			SEGGER_RTT_printf(0, "Reading from sensor, count %d, Humidity, %d, Temperature, %d\n", i, averagedHumidity, averagedTemperature);
+		}
+
+		SEGGER_RTT_printf(0, "Humidity, %d, Temperature, %d\n",averagedHumidity, averagedTemperature);
 
 		OSA_TimeDelay(50); /*	needed 	*/
 
+		/*
+		 *	This only serves for a demonstration that we can
+		 *	properly control the smoke sensor. Unfortunately
+		 *	due to the constrained time and resource, the sensor
+		 *	calibration cannot be carried out, therefore the
+		 *	received sensor output is of no great value.
+		 */
 		writeToSmokeSensor();
 
 		OSA_TimeDelay(100); /*	needed to wait for conversion to complete	*/
@@ -807,26 +873,28 @@ main(void)
 
 		OSA_TimeDelay(100);
 
-	//	ADC16_DRV_WaitConvDone(0 /*instance*/, 0x01/*channel 1*/);
-
-	//	uint16_t adcValue = ADC16_DRV_GetConvValueRAW(0 /*instance*/, 1U/*channel 1*/);
-
-	//	SEGGER_RTT_printf(0, "ADC value %d\n",adcValue);
-
-		piezoBuzzerEnable(10, 100);
-
 		uint8_t abnormalSoundCount = 0;
 		uint8_t abnormalMovementCount = 0;
 
+		/*
+		 *	First detect whether the mechanical switch is turned on/off
+		 */
 		if(GPIO_DRV_ReadPinInput(kWarpPinDetect_Switch))
 		{
 			for (uint8_t i = 0; i < 200; i++)
 			{
+				/*
+				 *	Check if abnormal event occurs for more than
+				 *	50 times out of 200.
+				 */
 				if (GPIO_DRV_ReadPinInput(kWarpPinDetect_Sound))
 				{
 					abnormalSoundCount++;
 					if (abnormalSoundCount > 50)
 					{
+						/*
+						 *	Turn on alarms
+						 */
 						piezoBuzzerEnable(10, 100);
 						for(int i = 0; i < 20; i++)
 						{
@@ -847,9 +915,16 @@ main(void)
 			{
 				if (GPIO_DRV_ReadPinInput(kWarpPinDetect_Movement))
 				{
+					/*
+					 *	Check if abnormal event occurs for more than
+					 *	3 times out of 10.
+					 */
 					abnormalMovementCount++;
 					if (abnormalMovementCount > 3)
 					{
+						/*
+						 *	Turn on alarms
+						 */
 						piezoBuzzerEnable(10, 100);
 						for(int i = 0; i < 20; i++)
 						{
@@ -890,10 +965,10 @@ void
 writeToTempHumidity(void)
 {
 	/*
-	 *	writing the control bytes
+	 *	writing the configuration
 	 */
 
-	uint8_t		i2cAddress, payloadByte[2], commandByte[1];
+	uint8_t		i2cAddress;
 	i2c_status_t	i2cStatus;
 
 	i2cAddress = 0x27; /* current sensor addr, 7-bit */
@@ -925,11 +1000,11 @@ writeToTempHumidity(void)
 	}
 }
 
-void
+int *
 readFromTempHumidity(void)
 {
 	uint8_t		i2cAddress;
-	i2c_status_t	i2cStatus;
+	static int	returnData[2];
 
 	i2cAddress = 0x27; /* current sensor addr, 7-bit */
 
@@ -939,9 +1014,7 @@ readFromTempHumidity(void)
 		.baudRate_kbps = gWarpI2cBaudRateKbps
 	};
 
-	uint8_t		cmdBuf[1]; /* buffer to store the register address */
 	uint8_t		rcvBuf[4] = {0,0,0,0}; /* buffer to store I2C read values */
-	uint16_t	currentValue;
 
 	i2c_status_t	returnValue; /* saved for use later in debugging */
 
@@ -963,12 +1036,12 @@ readFromTempHumidity(void)
 		SEGGER_RTT_printf(0, "\r\n\tI2C read failed, error %d.\n\n", returnValue);
 	}
 
-	uint16_t humidity = ((rcvBuf[0] & 0x3F) << 8) + rcvBuf[1];
-	humidity = 100.0 * humidity / (16384.0 - 2.0);
-	uint16_t temperature = (rcvBuf[2] << 6) + ((rcvBuf[3] & 0xFC) >> 2);
-	temperature = (1650.0 * temperature / (16384.0 - 2.0)) - 400.0;
+	returnData[0] = ((rcvBuf[0] & 0x3F) << 8) + rcvBuf[1];
+	returnData[0] = 100.0 * returnData[0] / (16384.0 - 2.0);
+	returnData[1] = (rcvBuf[2] << 6) + ((rcvBuf[3] & 0xFC) >> 2);
+	returnData[1] = (1650.0 * returnData[1] / (16384.0 - 2.0)) - 400.0;
 
-	SEGGER_RTT_printf(0, "Humidity, %d, Temperature, %d\n",humidity, temperature);
+	return returnData;
 }
 
 void
