@@ -897,11 +897,12 @@ main(void)
 				if (GPIO_DRV_ReadPinInput(kWarpPinDetect_Sound))
 				{
 					abnormalSoundCount++;
-					if (abnormalSoundCount > 50)
+					if (abnormalSoundCount > 2)//a small change overhere for demo
 					{
 						/*
 						 *	Turn on alarms
 						 */
+						SEGGER_RTT_printf(0, "Environment noise abnormal, 1\n");
 						piezoBuzzerEnable(10, 100);
 						for(int i = 0; i < 20; i++)
 						{
@@ -927,11 +928,12 @@ main(void)
 					 *	3 times out of 10.
 					 */
 					abnormalMovementCount++;
-					if (abnormalMovementCount > 3)
+					if (abnormalMovementCount > 1)//for demo purpose
 					{
 						/*
 						 *	Turn on alarms
 						 */
+						SEGGER_RTT_printf(0, "Human movement abnormal, 1\n");
 						piezoBuzzerEnable(10, 100);
 						for(int i = 0; i < 20; i++)
 						{
